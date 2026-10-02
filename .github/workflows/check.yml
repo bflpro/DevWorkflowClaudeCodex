@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Install PyYAML
+        run: python3 -m pip install pyyaml
       - name: Leak guard
         run: bash tools/check-clean.sh
       - name: Gate script tests

@@ -33,6 +33,10 @@ if command -v python3 >/dev/null && ! python3 -c 'import sys; sys.exit(sys.versi
 fi
 command -v git >/dev/null || { echo "Missing: git"; missing=1; }
 command -v node >/dev/null || echo "Warning: node not found — reflex hooks will not fire until Node.js is installed"
+if command -v python3 >/dev/null && ! python3 -c 'import yaml' 2>/dev/null; then
+  echo "Warning: PyYAML not found — task gates (task-accept, owns-check, wave-check) will fail."
+  echo "         Install it: python3 -m pip install pyyaml"
+fi
 [ "$missing" -eq 0 ] || exit 2
 git -C "$TARGET" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
   || echo "Warning: $TARGET is not a git repository; owns-check and task-accept need git"

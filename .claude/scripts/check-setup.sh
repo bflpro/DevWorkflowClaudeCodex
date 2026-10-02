@@ -32,6 +32,13 @@ if command -v python3 >/dev/null 2>&1; then
 else
   red "python3 не найден — check-readme, task-accept, owns-check и другие гейты не запустятся"
 fi
+if command -v python3 >/dev/null 2>&1; then
+  if python3 -c 'import yaml' 2>/dev/null; then
+    green "PyYAML установлен — карточки задач читаются"
+  else
+    red "PyYAML не найден — task-accept, owns-check, wave-check, findings-sync упадут. Поставь: python3 -m pip install pyyaml"
+  fi
+fi
 
 echo
 echo "2. Хуки в .claude/settings.json"

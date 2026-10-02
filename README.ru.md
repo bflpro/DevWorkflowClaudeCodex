@@ -38,7 +38,7 @@
 
 ## Установка
 
-Требуется: `git`, `python3` ≥ 3.11, `node` (для хуков-рефлексов).
+Требуется: `git`, `python3` ≥ 3.11 с PyYAML (`python3 -m pip install pyyaml`, им читают карточки задач гейты), `node` (для хуков-рефлексов).
 
 ```bash
 git clone https://github.com/bflpro/DevWorkflowClaudeCodex.git

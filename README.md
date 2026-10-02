@@ -42,7 +42,7 @@ Alongside the flow:
 
 ## Install
 
-Requires `git`, `python3` ≥ 3.11 and `node` (for reflex hooks).
+Requires `git`, `python3` ≥ 3.11 with PyYAML (`python3 -m pip install pyyaml`, used by the task gates) and `node` (for reflex hooks).
 
 ```bash
 git clone https://github.com/bflpro/DevWorkflowClaudeCodex.git
