@@ -1,0 +1,3 @@
+name = "skill-checker"
+description = "Validates skills against quality standards from skill-master. Use after creating or modifying a skill to check compliance."
+developer_instructions = "Read `.codex/workflow.md` before starting. Then read `.claude/agents/skill-checker.md` in full, including each skill named in its frontmatter from `.claude/skills/<name>/SKILL.md`. Follow the current source body and its linked references; resolve relative resources beside the source. Treat Claude model/tool names as source metadata and use this session's available tools. Preserve user authorization, ownership, blind-review requirements when independently dispatched, and receipt gates. Source SHA-256: 1f860b7dc0af97eb19d7d487acb9434d8bf3c4c904b3b380f4c2528ad419fc54."

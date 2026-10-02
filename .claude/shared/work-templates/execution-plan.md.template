@@ -1,0 +1,28 @@
+# Execution Plan: {Feature Name}
+
+**Создан:** YYYY-MM-DD
+
+---
+
+## Wave 1 (независимые)
+
+### Task 1: [название]
+- **Skill:** code-writing
+- **Reviewers:** thorough
+- **Verify-smoke:** `curl localhost:3000/api/endpoint` → 200
+
+### Task 2: [название]
+- **Skill:** code-writing
+- **Reviewers:** quick
+- **Verify-user:** open localhost:3000/users → form renders
+
+## Wave 2 (зависит от Wave 1)
+
+### Task 3: [название]
+- **Skill:** code-writing
+- **Reviewers:** thorough
+
+## Проверки, требующие участия пользователя
+
+- [ ] Task 2: пользователь проверяет [что именно]
+- [ ] После всех волн: финальное тестирование

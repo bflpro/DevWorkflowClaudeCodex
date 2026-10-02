@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+.codex/data/
+.workflow-backup/
+work/*/logs/working/
