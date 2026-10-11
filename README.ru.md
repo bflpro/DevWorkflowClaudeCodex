@@ -62,7 +62,7 @@ cd DevWorkflowClaudeCodex
 | `.claude/agents/` | субагенты: валидаторы спек и задач, ревьюеры кода, тестов, безопасности, QA |
 | `.claude/commands/` | slash-команды из таблицы в `templates/CLAUDE.md` |
 | `.claude/shared/` | шаблоны артефактов фичи, интервью, ревью-линзы, скрипт создания папки фичи |
-| `.claude/scripts/` | гейты: `task-accept.py`, `owns-check.py`, `wave-check.py`, `findings-sync.py`, `check-readme.py`, `check-techspec-readiness.py`, движок рефлексов |
+| `.claude/scripts/` | гейты: `task-accept.py`, `owns-check.py`, `wave-check.py`, `findings-sync.py`, `check-readme.py`, `check-techspec-readiness.py`, `check-refs.py`, `receipts-stats.py`, движок рефлексов |
 | `.claude/reflexes/` | рефлексы — короткие уроки с условием срабатывания |
 | `.claude/settings.json` | два хука: рефлексы и восстановление контекста после сжатия; в существующий файл хуки **дописываются** |
 | `CLAUDE.md`, `AGENTS.md`, `ENGINEERING.md` | правила проекта — только если их ещё нет |
@@ -107,7 +107,8 @@ cd DevWorkflowClaudeCodex && git pull
 ## Как проверить и как понять, что сломалось
 
 ```bash
-bash .claude/scripts/check-setup.sh            # хуки, интерпретаторы, скрипты на месте
+bash .claude/scripts/check-setup.sh            # хуки, интерпретаторы, скрипты на месте, ссылки резолвятся
+python3 .claude/scripts/receipts-stats.py      # сколько задач прошло ревью с первого раза
 python3 .codex/sync-workflow.py --check        # входные точки Codex соответствуют .claude/
 ```
 
@@ -135,7 +136,9 @@ python3 .codex/sync-workflow.py --check
 Скиллы `technical-writing` и профильные к нему — из
 [riekelt/technical-writer](https://github.com/riekelt/technical-writer) (MIT, текст лицензии —
 в `.claude/skills/technical-writing/LICENSE`). Правило выбора маршрута по размеру — по мотивам
-`bmad-build` из [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) (MIT).
+`bmad-build` из [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) (MIT). Правило
+минимального диффа (`ENGINEERING.md` §6) и идеи `check-refs.py` / `receipts-stats.py` — из
+[msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents) (MIT); код свой.
 
 ## Лицензия
 

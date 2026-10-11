@@ -65,7 +65,8 @@ echo "3. Скрипты и правила"
 for f in .claude/scripts/check-readme.py .claude/scripts/check-techspec-readiness.py \
          .claude/scripts/task-accept.py .claude/scripts/owns-check.py \
          .claude/scripts/wave-check.py .claude/scripts/findings-sync.py \
-         .claude/scripts/scan-staged-secrets.py; do
+         .claude/scripts/scan-staged-secrets.py .claude/scripts/check-refs.py \
+         .claude/scripts/receipts-stats.py; do
   if [ -f "$REPO_DIR/$f" ]; then green "$f"; else red "$f — отсутствует, переустанови workflow"; fi
 done
 if [ -f "$REPO_DIR/ENGINEERING.md" ]; then
@@ -89,6 +90,26 @@ if [ -d "$REPO_DIR/.codex" ] && [ -f "$REPO_DIR/.codex/sync-workflow.py" ]; then
   fi
 else
   green ".codex не установлен — пропуск"
+fi
+
+echo
+echo "5. Ссылки на скиллы, агентов, линзы и команды (check-refs.py)"
+echo "   (ссылка только в ~/.claude — у коллеги на другой машине её нет)"
+if [ -f "$REPO_DIR/.claude/scripts/check-refs.py" ] && command -v python3 >/dev/null 2>&1; then
+  refs_out="$(python3 "$REPO_DIR/.claude/scripts/check-refs.py" 2>&1)"; refs_code=$?
+  case "$refs_code" in
+    0) if printf '%s' "$refs_out" | grep -q '^WARN'; then
+         yellow "всё резолвится, но часть — только через ~/.claude:"
+         printf '%s\n' "$refs_out" | grep '^WARN' | sed 's/^/        /'
+       else
+         green "$(printf '%s' "$refs_out" | tail -1)"
+       fi ;;
+    1) red "есть ссылки на несуществующие скиллы/агентов/команды:"
+       printf '%s\n' "$refs_out" | grep -E '^(ERROR|WARN)' | sed 's/^/        /' ;;
+    *) yellow "check-refs.py ничего не проверил (код $refs_code) — запусти вручную" ;;
+  esac
+else
+  yellow "check-refs.py или python3 не найден — проверка ссылок пропущена"
 fi
 
 echo

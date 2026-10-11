@@ -113,6 +113,9 @@ description: |
    - Follow project patterns (from Phase 1) or apply baseline from [universal-patterns.md](references/universal-patterns.md)
    - Use env vars for secrets, validate inputs at boundaries
    - Handle edge cases, comment WHY not WHAT
+   - Minimal diff (`ENGINEERING.md` §6): every changed line is required by the task; no drive-by
+     refactors, renames or docstrings for untouched code; out-of-scope findings go to
+     `## Implementation Notes`, never into the diff
 
 4. **Run Tests**
    - All new tests pass

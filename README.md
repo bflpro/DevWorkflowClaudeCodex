@@ -65,7 +65,7 @@ start a new session, trust the project, check `/hooks`, and invoke `$source-comm
 | `.claude/agents/` | subagents: spec and task validators, code/test/security reviewers, QA |
 | `.claude/commands/` | slash commands (table in `templates/CLAUDE.md`) |
 | `.claude/shared/` | feature artifact templates, interview templates, review lenses, feature-folder script |
-| `.claude/scripts/` | gates: `task-accept.py`, `owns-check.py`, `wave-check.py`, `findings-sync.py`, `check-readme.py`, `check-techspec-readiness.py`, the reflex engine |
+| `.claude/scripts/` | gates: `task-accept.py`, `owns-check.py`, `wave-check.py`, `findings-sync.py`, `check-readme.py`, `check-techspec-readiness.py`, `check-refs.py`, `receipts-stats.py`, the reflex engine |
 | `.claude/reflexes/` | reflexes — short lessons with a trigger condition |
 | `.claude/settings.json` | two hooks (reflexes, context restore after compaction); merged into an existing file |
 | `CLAUDE.md`, `AGENTS.md`, `ENGINEERING.md` | project rules — only when absent |
@@ -108,7 +108,8 @@ Files you did not change are updated; changed ones stay yours and are listed so 
 ## Checking and troubleshooting
 
 ```bash
-bash .claude/scripts/check-setup.sh            # hooks, interpreters, scripts in place
+bash .claude/scripts/check-setup.sh            # hooks, interpreters, scripts in place, references resolve
+python3 .claude/scripts/receipts-stats.py      # how many tasks passed review on the first pass
 python3 .codex/sync-workflow.py --check        # Codex entrypoints match .claude/
 ```
 
@@ -136,7 +137,9 @@ repository. When you change a skill, command or agent, regenerate the Codex entr
 `technical-writing` and its sibling skills come from
 [riekelt/technical-writer](https://github.com/riekelt/technical-writer) (MIT; license text in
 `.claude/skills/technical-writing/LICENSE`). The size-based routing rule is adapted from
-`bmad-build` in [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) (MIT).
+`bmad-build` in [BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) (MIT). The minimal-diff
+rule (`ENGINEERING.md` §6) and the ideas behind `check-refs.py` / `receipts-stats.py` come from
+[msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents) (MIT); the code is ours.
 
 ## License
 

@@ -14,6 +14,8 @@
 | `check-readme.py --changed` | Обязательные разделы в тронутых README проектов | перед коммитом |
 | `scan-staged-secrets.py` | Секреты и запрещённые файлы (`.env`, ключи) в индексе git | перед коммитом (свой pre-commit хук проекта) |
 | `check-setup.sh` | Диагностика установки: node/python3, хуки в `settings.json`, наличие скриптов, сверка `.codex` | руками после установки |
+| `check-refs.py` | Ссылки `skills:` / `reviewers:` карточек и агентов и `/команды` из CLAUDE.md резолвятся в файлы репозитория | `check-setup.sh` шаг 5, перед коммитом правок в `.claude/` |
+| `receipts-stats.py` | Сводка по квитанциям: доля задач с первого раза, раунды ревью на задачу, кто из ревьюеров находит | руками, при ревью конвейера |
 | `reflex-check.mjs` | PreToolUse-хук: подсовывает урок из `.claude/reflexes/` перед совпавшим вызовом | `settings.json` |
 | `post-compact-restore.sh` | PostCompact-хук: после сжатия контекста восстанавливает лиду контекст выполняемой фичи из `checkpoint.yml` | `settings.json` |
 
@@ -72,6 +74,11 @@ status: done  ⇐ только при accepted: true        /done: провер�
 [VKirill/claude-lane-stack](https://github.com/VKirill/claude-lane-stack) @ `e01145e` (v1.27.0, MIT).
 Код написан с нуля под layout `work/<feature>/tasks/N.md`; из репозитория ничего не копировалось,
 ставить его целиком сочли избыточным.
+
+`check-refs.py` — идея «каждый слаг ростера резолвится в файл» из `scripts/check-runbooks.sh`,
+`receipts-stats.py` — идея отчёта «first-pass rate, retries per task» из `strategy/coordination/`;
+оба — [msitarzewski/agency-agents](https://github.com/msitarzewski/agency-agents) @ `f99f6aa`
+(08.10.2026, MIT). Код написан с нуля под наши карточки и квитанции.
 
 ## Форматы
 
@@ -166,6 +173,33 @@ python3 .claude/scripts/check-readme.py --all                      # инвен�
 Тесты: `python3 .claude/scripts/tests/test_check_readme.py` (8 тестов). Мутанты «пустой список
 разделов», «заголовки в блоке кода считаются», «вступление не проверяется» тестами убиваются.
 
+## `check-refs.py` — ссылки резолвятся в файлы
+
+Карточка задачи ссылается на скиллы (`skills:`) и ревьюеров (`reviewers:`), агент — на скиллы,
+`CLAUDE.md` — на команды. Переименованный или удалённый скилл ломает это молча: модель грузит
+то, что нашла, и не сообщает, чего не нашла. Скрипт резолвит каждую ссылку в файл:
+
+| Ссылка | Куда резолвится |
+|---|---|
+| `skills: [x]` | `.claude/skills/x/SKILL.md` |
+| `reviewers: [x]` | набор линз `quick` / `thorough` / `none`, файл `.claude/shared/review-lenses/x.md` или агент `.claude/agents/x.md` (легаси) |
+| `` `/x` `` в CLAUDE.md | `.claude/commands/x.md` или `.claude/skills/x/`; встроенные (`/clear`, `/compact`, `/context`) пропускаются |
+
+Нашлось только в `~/.claude/` — `WARN` (у коллеги на другой машине этого нет); не нашлось
+нигде — `ERROR`. Карточки `status: done` пропускаются (они запечатаны квитанцией), `--include-done`
+включает их. `--no-personal` показывает картину чужой машины. Нечитаемый frontmatter — `ERROR`,
+не тишина: карточка с `status:` в тексте, но без разобранного YAML, считается сломанной.
+
+## `receipts-stats.py` — что говорят квитанции
+
+Складывает `work/*/logs/receipts/task-*/acceptance.json`: сколько принято, сколько «с первого
+раза» (`attempt` = 1 и ни у одного ревью нет `round` > 1), распределение задач по максимальному
+раунду, и по каждому ревьюеру — сколько квитанций он видел и в скольких его последний раунд
+закончился не `approved` / `triaged`. `--by-feature` даёт ту же сводку на фичу, `--since` режет
+по дате квитанции. Нечитаемая квитанция — `ERROR` и код 1, сводка по остальным всё равно
+печатается. Зачем: видеть, какие линзы находят, а какие молчат, и сколько циклов стоит задача,
+до того как менять наборы линз.
+
 ## Коды возврата
 
 | Скрипт | 0 | 1 | 2 | 3 |
@@ -175,10 +209,14 @@ python3 .claude/scripts/check-readme.py --all                      # инвен�
 | findings-sync | нет открытых critical | есть открытые critical | нет отчётов | — |
 | task-accept | `accepted: true` | `accepted: false` | нет задачи | — |
 | check-readme | все проверенные README полные (или выборка пуста — печатается явно) | есть пробелы | файл не найден / нет аргументов | — |
+| check-refs | все ссылки в репозитории (WARN на личные копии не влияет на код) | есть ERROR или сломанный frontmatter | нечего проверять | — |
+| receipts-stats | сводка напечатана | часть квитанций не прочиталась | квитанций нет | — |
 
 ## Запуск и тесты
 
 ```bash
+python3 .claude/scripts/check-refs.py                     # ссылки .claude/ и карточек
+python3 .claude/scripts/receipts-stats.py --by-feature     # сводка по квитанциям
 python3 -m unittest discover -s .claude/scripts/tests -t .claude/scripts/tests   # 45 тестов
 python3 .claude/scripts/wave-check.py work/<feature>
 python3 .claude/scripts/task-accept.py work/<feature> 3
