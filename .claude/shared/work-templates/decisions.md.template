@@ -16,7 +16,8 @@ Review details — in JSON files via links. QA report — in logs/working/.
 **Commit:** abc1234
 **Agent:** [teammate name or "main agent"]
 **Summary:** 1-3 sentences: what was done, key decisions. Not a file list.
-**Deviations:** None / Deviated from spec: [reason], did [what].
+**Deviations:** None / one entry per deviation, four fields:
+  `Deviation:` found [what the plan did not cover] / plan said [what] / did [the conservative option] / why [one line].
 
 **Reviews:**
 

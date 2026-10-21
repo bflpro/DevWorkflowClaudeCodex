@@ -53,8 +53,8 @@
     ".agents/skills/feature-execution/SKILL.md": {
       "source": ".claude/skills/feature-execution/SKILL.md",
       "source_index_path": ".claude/skills/feature-execution/SKILL.md",
-      "source_sha256": "aed08ad78d6eee9b9d843ffbe0a7cc210a65f813d86d04c139a960bbb1356235",
-      "target_sha256": "6d1f781bd483c72a2fb65d131f0c10f5e8a103f25b1d7f9c6169cf96800b4376"
+      "source_sha256": "1ee9ee2e52afcf09d1b2a08b2e4b90417593523b43efab797e1137aaa9c0966c",
+      "target_sha256": "94feb99ef4f45e6000080b92d8cbe422c867de6eaf89d431a1661ff836236220"
     },
     ".agents/skills/grilling/SKILL.md": {
       "source": ".claude/skills/grilling/SKILL.md",
@@ -161,8 +161,8 @@
     ".agents/skills/user-spec-planning/SKILL.md": {
       "source": ".claude/skills/user-spec-planning/SKILL.md",
       "source_index_path": ".claude/skills/user-spec-planning/SKILL.md",
-      "source_sha256": "2ea97e0e0cdf3df516afeee48dddb8d373b682b417f31f378f9eef7752e9ae62",
-      "target_sha256": "c72070732d786a87671773d799c6d98ece516f9abf7ec2a4bda6d6ec5e224b21"
+      "source_sha256": "141b1ec6f7a8a8b5e0e5aeae7925a682d3739dcc6711d0184177bdee8d94db83",
+      "target_sha256": "8549834596128d8a01a744c8bf00295944396bf1feeae781aaa3f097e71d04a4"
     },
     ".agents/skills/writing-changelogs/SKILL.md": {
       "source": ".claude/skills/writing-changelogs/SKILL.md",

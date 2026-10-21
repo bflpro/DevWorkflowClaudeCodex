@@ -19,6 +19,7 @@ story of how well it went.
    │ ≤100 lines, ≤5 files,                   │ otherwise
    │ no external writes, level ≤ L1          ▼
    ▼                         /new-user-spec   interview → work/<feature>/user-spec.md
+                                              (new external system → blindspots.md before cycle 2)
  oneshot: task card,         /new-tech-spec   architecture, decisions, criteria with verify commands
  code, one review lens,      /decompose-tech-spec  task cards: owns_paths, reads, TDD Anchor
  receipt                     /do-feature      agent waves:

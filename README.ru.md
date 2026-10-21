@@ -15,6 +15,7 @@
    │ ≤100 строк, ≤5 файлов,            │ иначе
    │ без записи наружу, L ≤ 1          ▼
    ▼                         /new-user-spec   интервью → work/<feature>/user-spec.md
+                                              (новая внешняя система → blindspots.md до цикла 2)
  oneshot: карточка,          /new-tech-spec   архитектура, решения, критерии с verify-командами
  код, одна ревью-линза,      /decompose-tech-spec  карточки задач: owns_paths, reads, TDD Anchor
  квитанция                   /do-feature      волны агентов:

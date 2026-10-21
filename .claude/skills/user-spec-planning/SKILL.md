@@ -69,6 +69,17 @@ These files are your context for the entire interview. Reference them when askin
    - M: propose whether integration tests make sense, explain reasoning
    - L: propose specific integration and E2E scope with justification
 
+### Phase 2b: Domain Blindspot Pass (new external system or craft domain only)
+
+The code scan finds what the repo knows; it cannot find what nobody on the team knows yet. After Cycle 1, decide whether the feature enters an external system or a craft domain that is **new for the team**: grep `projects/`, `work/`, `.claude/skills/project-knowledge/references/` and the auto-memory index for the system's name. Known → skip this phase and say so in one line. New → before Cycle 2, launch one `general-purpose` subagent (opus) that writes `{feature_path}/blindspots.md` with four sections, each a short list:
+
+1. **Questions the user did not know to ask** — rate limits and quotas, auth model, delivery windows, idempotency, sandbox vs production, what the vendor logs or does not;
+2. **What "good" looks like here** — the industry default the user would otherwise get silently;
+3. **Prior work in this repo** — integrations, memory notes, incidents that touched the same system;
+4. **Potholes** — known failure modes from vendor docs, GitHub issues and our own incident write-ups.
+
+Sources in the order of `CLAUDE.md` §4a: Context7, Firecrawl on the vendor docs (`firecrawl_map` first, then single-page scrapes; a crawl over ~50 pages needs the user's permission), GitHub issues (§4b), `book-research-pipeline` for a craft domain. Each item cites its source; an item with no source is marked `assumption`. The pass turns unknown unknowns into interview questions: section 1 feeds Cycle 2, section 4 feeds the Risks of the spec. Reason: every new integration (SMS signing, WABA, telephony) found its first potholes in production, after the interview had closed.
+
 ### Phase 3: Code Scanning
 
 Launch `code-researcher` subagent (Task tool, opus) with feature path and feature description from Cycle 1.
@@ -83,6 +94,7 @@ If during later phases a gap is discovered — launch `code-researcher` again wi
 
 1. Summarize understanding: "Я понял задачу так: [X]. Делать планирую так: [Y, based on code]."
 2. Questions based on code findings: "Нашёл модуль X, который делает Y — переиспользуем?"
+   When `blindspots.md` exists, its section 1 questions are asked in this cycle first — they are the ones the user cannot raise unprompted.
 3. Cover deploy and user actions (items `deploy_approach`, `manual_user_actions`):
    - "Нужны ли ручные шаги для запуска? (создать бота, получить API ключи, настроить сервис, зарегистрироваться где-то)"
    - "Как деплоить? Что нужно настроить? (уже есть CI/CD, нужно настроить, ручной деплой)"
@@ -100,7 +112,7 @@ Run interview loop on remaining gaps.
 
 ### Phase 6: Completeness Check
 
-Launch `interview-completeness-checker` subagent (Task tool, sonnet) with feature path. It reviews interview.yml against PK files and code-research.md.
+Launch `interview-completeness-checker` subagent (Task tool, sonnet) with feature path. It reviews interview.yml against PK files and code-research.md. When `blindspots.md` exists, the launch prompt names it explicitly — the agent definition does not read it on its own: "also read `{feature_path}/blindspots.md`; a section-1 question with no answer in interview.yml is a gap".
 
 - `needs_more` → ask the suggested questions, re-run checker
 - `complete` → proceed to Phase 7
@@ -118,6 +130,7 @@ Launch `interview-completeness-checker` subagent (Task tool, sonnet) with featur
    - "Зачем" — concrete user value, not "улучшить UX"
    - Acceptance criteria — testable, no "работает корректно"
    - Every discussed topic from interview must appear in the spec
+   - When `blindspots.md` exists, its section 4 (potholes) items appear in the spec's Risks — each as a risk or as a consciously accepted limitation
    - "Не делаем" and "Сигнал успеха" are filled from the interview, never left as template text — the
      five-field core (что / зачем / как / не делаем / сигнал успеха) is what a tech-spec and a task card
      are allowed to quote; everything else in the spec is appendix (since 2026-09-30)

@@ -125,6 +125,12 @@ Reason: when the lead does task work, it pollutes context with implementation de
    never to the scratchpad root, and never under a generic name. Before executing a scratch script
    you wrote earlier in the session, re-check that its content is still yours (header line or hash).
 
+   When the plan is silent on a case you hit, first ask whether the card's Intent settles it. It
+   does → take the conservative option (fewer writes outward, fewer new code paths, easier to
+   revert), log a `Deviation:` entry in decisions/task-{N}.md with four fields — found / plan said /
+   did / why — and keep going; do not stall the wave on a question the card already answers. It does
+   not → write the gap down and ask the lead; never guess at intent.
+
    After task complete:
    - Write your entry to {feature_dir}/decisions/task-{N}.md (follow template at
      .claude/shared/work-templates/decisions.md.template (fallback: ~/.claude/shared/work-templates/decisions.md.template)). One file per task — do NOT append to a
