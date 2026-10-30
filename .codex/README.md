@@ -78,3 +78,12 @@ Rollback is a reviewed restoration from `.codex/data/workflow-backup/` plus the 
 - [openai/codex](https://github.com/openai/codex/tree/14a477ea89712071944244022e8a10142845456e): hook config types and skill/agent-role discovery (`~/.agents/skills`, repo `.agents/skills`, `.codex/agents/*.toml`); runtime protocol follows the official Codex hooks and skills documentation.
 
 No external dependency is added.
+
+## Resource assignments and feedback
+
+Shared policy: `.claude/shared/workflow-resources/README.md` and `policy.json`. Installed
+project defaults select Terra medium for generic subagents; generated custom roles pin
+routine, critical or extraction tiers. Main-session model selection remains separate.
+Marked model fields follow policy; unmarked local overrides remain intact. Reload
+discovery after installation. Fixed-role escalation uses its own bounded profile.
+`task-accept.py` collects local receipt/finding metrics; missing model/usage remains unknown.

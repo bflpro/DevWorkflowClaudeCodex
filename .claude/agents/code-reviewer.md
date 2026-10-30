@@ -4,7 +4,7 @@ description: |
   Review code quality after implementation.
   Use after completing code tasks to verify quality standards.
   Proactive: invoke automatically after any code implementation.
-model: inherit
+model: sonnet
 color: blue
 skills:
   - code-reviewing

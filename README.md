@@ -71,7 +71,7 @@ start a new session, trust the project, check `/hooks`, and invoke `$source-comm
 | `.claude/settings.json` | two hooks (reflexes, context restore after compaction); merged into an existing file |
 | `CLAUDE.md`, `AGENTS.md`, `ENGINEERING.md` | project rules — only when absent |
 | `.codex/`, `.agents/skills/` | with `--codex`: the adapter and generated entrypoints |
-| `.gitignore` | `work/*/logs/working/`, `.codex/data/`, `.workflow-backup/` |
+| `.gitignore` | `work/*/logs/working/`, `.codex/data/`, `.claude/state/`, `.workflow-backup/` |
 
 `ENGINEERING.md` has "fill in" sections (stack, deploy). Fill them for your project; skills
 refer to the other sections by number, so keep the numbering.
@@ -91,7 +91,7 @@ refer to the other sections by number, so keep the numbering.
 ## Invariants
 
 - `install.sh` never replaces a file you modified without `--force`, and backs it up first when
-  forced; it never touches an existing `CLAUDE.md`, `AGENTS.md` or `ENGINEERING.md`.
+  forced; existing project rules are preserved. A shared resource-policy link is appended to `CLAUDE.md` when missing; `AGENTS.md` and `ENGINEERING.md` remain yours.
 - Re-running with no upstream changes reports `added 0` and changes nothing.
 - The Codex generator never deletes files and refuses to overwrite hand-edited entrypoints.
 - Nothing goes over the network: installer, gates and hooks work on local files only.
@@ -145,3 +145,33 @@ rule (`ENGINEERING.md` §6) and the ideas behind `check-refs.py` / `receipts-sta
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Resource routing and lightweight feedback
+
+Routine research, specifications, task creation/validation and review use Sonnet in Claude
+or GPT-6.1 Terra / medium in Codex. Critical security/deployment/architecture/data work uses
+Opus or GPT-6.1 Sol / high. Extraction alone can use Haiku or GPT-6 Luna / low. These are
+pilot assignments, not measured quality equivalence. Source and usage:
+[resource policy](.claude/shared/workflow-resources/README.md). Parent-session model selection
+is separate; reload the client/session after installing.
+
+The installer merges missing generic Codex defaults into project `.codex/config.toml`,
+preserving existing explicit settings and MCP configuration. Custom-role model settings
+are generated from policy; fixed-role escalation has a separate profile.
+
+Every acceptance attempt collects local receipt/finding aggregates, with optional measured
+per-run resources. Missing measurements stay unknown. No model/network call is added.
+A local report refreshes after 10 newly accepted tasks or seven days with new accepted
+data on the next acceptance invocation. Inspect with:
+
+```bash
+python3 .claude/scripts/workflow-metrics.py report
+```
+
+For another computer working on the **same project**, commit and push the installed files,
+then `git pull --ff-only` there and start a new agent session. Global home configuration
+and runtime metrics are not transferred. For another project install from this repository
+with `--codex`. For an older installation, inspect `--dry-run` first: differing local files
+are preserved, so review/merge those files or explicitly use `--force` (originals are backed
+up). Installing only the new files while keeping old execution skills does not complete
+the migration. Tests: `python3 -m unittest discover -s tools -p 'test_*.py'`.

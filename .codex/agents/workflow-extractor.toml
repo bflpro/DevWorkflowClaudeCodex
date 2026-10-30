@@ -1,0 +1,6 @@
+# workflow-resource-policy: managed model defaults
+name = "workflow-extractor"
+description = "Extract bounded facts or summarize already-triaged findings with source paths. Never approve code, security, architecture, specifications or acceptance."
+developer_instructions = "Read `.codex/workflow.md` before starting. Then read `.claude/agents/workflow-extractor.md` in full, including each skill named in its frontmatter from `.claude/skills/<name>/SKILL.md`. Follow the current source body and its linked references; resolve relative resources beside the source. Treat Claude model/tool names as source metadata and use this session's available tools. Preserve user authorization, ownership, blind-review requirements when independently dispatched, and receipt gates. Source SHA-256: cdc5410a02ee80eae1c0acbf1ea09ab680803dc8684be6a655f522e1710779ca."
+model = "gpt-6-luna"
+model_reasoning_effort = "low"

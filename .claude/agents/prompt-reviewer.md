@@ -4,7 +4,7 @@ description: |
   Reviews LLM prompt quality against prompt-master principles.
   Checks clarity, structure, examples, compression, positive framing.
   Use after writing or modifying LLM prompts.
-model: inherit
+model: sonnet
 color: blue
 skills:
   - prompt-master

@@ -6,7 +6,7 @@ description: |
 
   Triggers: after task-creator generates files, on re-validation after fixes.
   Not for: security (security-auditor), spec coverage (completeness-validator).
-model: inherit
+model: sonnet
 color: yellow
 allowed-tools: Read, Glob, Grep, Write, Bash
 ---

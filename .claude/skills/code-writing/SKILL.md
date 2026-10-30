@@ -178,7 +178,7 @@ description: |
    1. Write the unified diff of this change (from the card's `start_commit`, or from the first edit
       when standalone; untracked files included) to `<scratchpad>/review-{N}/diff.patch`. Lenses read
       it by path; the diff is never pasted into a prompt.
-   2. Launch every lens of the set as a context-free subagent (`general-purpose`, `model: "sonnet"`;
+   2. Launch every lens of the set with resources resolved by `.claude/scripts/workflow-route.py` (see `.claude/shared/workflow-resources/README.md`); routine lenses use Sonnet / Terra medium, security/prod-readiness use Opus / Sol high (`general-purpose`;
       `security` → `subagent_type: "security-auditor"`) in the same turn, `run_in_background: false`,
       with `{diff_file}`, `{card}`, `{report}` = `logs/working/task-{N}/{lens}-1.json`
       (`{N}` = task number, `"standalone"` without a task file) and, for `intent-alignment`, the

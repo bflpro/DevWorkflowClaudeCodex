@@ -10,6 +10,17 @@ description: |
 
 # Feature Execution
 
+## Resource and context policy
+
+Before research, drafting, validation or execution, read
+`.claude/shared/workflow-resources/README.md` and resolve the role with
+`.claude/scripts/workflow-route.py`. This shared policy supersedes model names in legacy
+examples below: routine work is Sonnet / Codex Terra medium; risk-triggered work uses the
+critical profile. Do not dispatch every role on the parent model by inheritance. Without
+user-authorized delegation, execute inline, record the current model and self-review
+limitation; a requested assignment does not switch the parent session model. Pass bounded
+paths/questions, reuse one relevant observations brief per phase, and preserve receipt gates.
+
 ## Role Boundary
 
 You are a dispatcher, not a doer. Your job: spawn agents, wait for results, update status, commit orchestration changes, communicate with user.
@@ -99,7 +110,7 @@ Reason: when the lead does task work, it pollutes context with implementation de
    session: two agents writing generically named files (`run.py`, `out.json`) to the scratchpad root
    is a race whose losing side executes someone else's code under its own arguments.
 
-   **Teammate** — `subagent_type: "general-purpose"`, `model: "opus"`, `team_name: "{team}"`
+   **Teammate** — `subagent_type: "general-purpose"`, `model: <resolved Claude model>`, `team_name: "{team}"`; resolve implementation/skill and risk through the resource policy. Codex uses its adapter and resolved model/effort.
 
    Prompt template:
 
@@ -187,7 +198,7 @@ Reason: when the lead does task work, it pollutes context with implementation de
       untracked) to `{scratchpad}/task-{N}-review/diff.patch`. The diff goes to lenses as a path, never
       inline.
    3. Launch every lens of the set **in one turn** as context-free subagents (`general-purpose`,
-      `model: "sonnet"`; `security` → `subagent_type: "security-auditor"`), `run_in_background: false`,
+      `model: <resolved lens model>`; `security` → `subagent_type: "security-auditor"`; Codex uses the resolved profile/model/effort), `run_in_background: false`,
       prompt = the lens file with `{diff_file}`, `{card}`, `{report}`
       (`{feature_dir}/logs/working/task-{N}/{lens}-1.json`) and, for `intent-alignment`,
       `{verbatim_intent}` substituted. Key names in the envelope are quoted from
@@ -221,7 +232,7 @@ Reason: when the lead does task work, it pollutes context with implementation de
 
 ### Audit Wave tasks
 
-Audit Wave is conditional (tech-spec-planning step 5: level ≥ L1 and an external write, a server unit or ≥ 4 code tasks); a tech-spec without it carries a one-line skip reason — check the reason against the tasks before accepting the plan, and add the wave if the reason is false. When present, its tasks (Code Audit, Security Audit, Test Audit) have `reviewers: [none]` — each auditor teammate IS the review. Spawn them as standard teammates (general-purpose, opus), each loads its methodology skill.
+Audit Wave is conditional (tech-spec-planning step 5: level ≥ L1 and an external write, a server unit or ≥ 4 code tasks); a tech-spec without it carries a one-line skip reason — check the reason against the tasks before accepting the plan, and add the wave if the reason is false. When present, its tasks (Code Audit, Security Audit, Test Audit) have `reviewers: [none]` — each auditor teammate IS the review. Resolve each auditor through the resource policy: routine code/test audit uses Sonnet / Terra medium; security and high-risk audit uses Opus / Sol high. Each loads its methodology skill; do not force every auditor onto Opus.
 
 Each auditor:
 - Reads decisions.md to understand what was done in each task

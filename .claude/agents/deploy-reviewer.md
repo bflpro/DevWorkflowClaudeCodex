@@ -5,7 +5,7 @@ description: |
   Checks GitHub Actions workflows, deploy scripts, secrets management,
   platform configuration.
   Orchestrator specifies what to check and provides file paths.
-model: inherit
+model: opus
 color: orange
 skills:
   - deploy-pipeline

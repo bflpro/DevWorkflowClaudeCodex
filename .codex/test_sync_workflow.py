@@ -96,6 +96,51 @@ class SyncTests(unittest.TestCase):
         self.assertEqual((self.root / ".codex/workflow-manifest.json").read_bytes(), manifest)
         self.assertTrue(target.read_text().endswith("Intentional local work.\n"))
 
+    def add_policy(self, model="gpt-6.1-terra", effort="medium"):
+        self.put(".claude/shared/workflow-resources/policy.json", json.dumps({
+            "roles": {"reviewer": "routine"},
+            "tiers": {"routine": {"codex": {"model": model, "model_reasoning_effort": effort}}},
+        }))
+
+    def test_policy_assigns_model_and_effort_to_new_and_existing_roles(self):
+        self.add_policy()
+        self.module.sync(self.root, write=True)
+        path = self.root / ".codex/agents/reviewer.toml"
+        role = tomllib.loads(path.read_text())
+        self.assertEqual(role["model"], "gpt-6.1-terra")
+        self.assertEqual(role["model_reasoning_effort"], "medium")
+        self.assertEqual(self.module.sync(self.root), [])
+        self.add_policy("gpt-6.1-sol", "high")
+        self.module.sync(self.root, write=True)
+        self.assertEqual(tomllib.loads(path.read_text())["model"], "gpt-6.1-sol")
+
+    def test_unmarked_runtime_overrides_and_nested_settings_survive_policy_sync(self):
+        self.add_policy()
+        self.put(".codex/agents/reviewer.toml", 'name = "reviewer"\nmodel = "gpt-6-sol"\nmodel_reasoning_effort = "high"\n[features]\nexample = false\n')
+        self.module.sync(self.root, write=True, adopt=True)
+        role = tomllib.loads((self.root / ".codex/agents/reviewer.toml").read_text())
+        self.assertEqual(role["model"], "gpt-6-sol")
+        self.assertEqual(role["model_reasoning_effort"], "high")
+        self.assertFalse(role["features"]["example"])
+
+    def test_edited_managed_model_is_not_silently_overwritten(self):
+        self.add_policy()
+        self.module.sync(self.root, write=True)
+        path = self.root / ".codex/agents/reviewer.toml"
+        path.write_text(path.read_text().replace('model = "gpt-6.1-terra"', 'model = "gpt-6-sol"'))
+        with self.assertRaises(self.module.ConflictError):
+            self.module.sync(self.root, write=True)
+
+    def test_staged_policy_change_requires_matching_generated_manifest(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        self.add_policy()
+        self.module.sync(self.root, write=True)
+        subprocess.run(["git", "add", "."], cwd=self.root, check=True)
+        self.assertEqual(self.module.check_staged(self.root), [])
+        self.add_policy("gpt-6.1-sol", "high")
+        subprocess.run(["git", "add", ".claude/shared/workflow-resources/policy.json"], cwd=self.root, check=True)
+        self.assertIn("Index differs from manifest: .claude/shared/workflow-resources/policy.json", self.module.check_staged(self.root))
+
     def test_idempotence_does_not_rewrite_files(self):
         self.module.sync(self.root, write=True)
         manifest = self.root / ".codex/workflow-manifest.json"

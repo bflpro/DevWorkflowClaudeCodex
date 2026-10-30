@@ -4,7 +4,7 @@ description: |
   Prescriptive test quality analysis: finds problems and provides concrete fixes.
   Analyzes written test code, test strategy from tech-spec, or both.
   Orchestrator specifies what to check and provides file paths.
-model: inherit
+model: sonnet
 color: blue
 skills:
   - test-master

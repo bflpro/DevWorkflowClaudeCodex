@@ -232,3 +232,21 @@ python3 .claude/scripts/task-accept.py work/<feature> 3
 - `FINDINGS.md` с блоком «Open for more than one round» — находка едет через раунды без вердикта.
 - `wave-check` молчит про волну, в которой явно есть зависимость → у задач пустые `owns_paths`
   (смотреть `skipped_no_owns_paths`), это находка `task-validator` §A.
+
+
+## Workflow resources and lightweight metrics (30.10.2026)
+
+`workflow-route.py` resolves requested models/effort for both runtimes from
+`.claude/shared/workflow-resources/policy.json`; it never spawns an agent or switches a session.
+`workflow-metrics.py` is called automatically by `task-accept.py` after writing the receipt,
+on acceptance and rejection. It reads receipt/finding counters and optional
+`evidence-workflow-run-*.json` in task working logs; it sends nothing outside. No new
+dependency, schedule or model call. Errors warn without changing the acceptance verdict.
+
+Ignored runtime state/report: `.claude/state/workflow-metrics/`, bounded to 500 task contracts,
+90 days and 100 execution records per task. Local lock and atomic writes protect updates.
+Missing measurements remain unknown. The saved report refreshes after 10 new accepted
+contracts or 7 days with new accepted data, on the next invocation. Inspect any time with
+`python3 .claude/scripts/workflow-metrics.py report`; tests:
+`python3 .claude/scripts/tests/test_workflow_metrics.py`. Schema, flow, reasoning, invariants,
+diagnosis and provenance: `.claude/shared/workflow-resources/README.md`.

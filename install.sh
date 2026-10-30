@@ -100,7 +100,7 @@ fi
 # --- root documents: only when absent ---------------------------------------
 for doc in ENGINEERING.md CLAUDE.md AGENTS.md; do
   if [ -e "$TARGET/$doc" ]; then
-    echo "  $doc exists — not touched; compare with $SRC/templates/$doc and merge what you need"
+    echo "  $doc exists — project rules kept; resource policy link configured below; compare with $SRC/templates/$doc and merge what you need"
   else
     run cp "$SRC/templates/$doc" "$TARGET/$doc"; added=$((added + 1))
   fi
@@ -108,11 +108,17 @@ done
 
 # --- .gitignore: runtime data of the workflow -------------------------------
 GI="$TARGET/.gitignore"
-for line in 'work/*/logs/working/' '.codex/data/' '.workflow-backup/' '__pycache__/'; do
+for line in 'work/*/logs/working/' '.codex/data/' '.claude/state/' '.workflow-backup/' '__pycache__/'; do
   if ! { [ -e "$GI" ] && grep -qxF "$line" "$GI"; }; then
     if [ "$DRY" -eq 1 ]; then echo "  [dry-run] .gitignore += $line"; else echo "$line" >> "$GI"; fi
   fi
 done
+
+# Append the policy to existing project rules and merge only absent Codex defaults.
+resource_args=("$TARGET")
+[ "$CODEX" -eq 1 ] && resource_args+=(--codex)
+[ "$DRY" -eq 1 ] && resource_args+=(--dry-run)
+python3 "$SRC/tools/configure-resources.py" "${resource_args[@]}"
 
 # --- Codex ------------------------------------------------------------------
 if [ "$CODEX" -eq 1 ]; then
@@ -127,7 +133,7 @@ if [ "$CODEX" -eq 1 ]; then
     adopt=""
     [ -e "$TARGET/.codex/workflow-manifest.json" ] || adopt="--adopt-existing"
     (cd "$TARGET" && python3 .codex/sync-workflow.py --write $adopt) \
-      || echo "  Codex entrypoints not generated — see the message above and .codex/README.md"
+      || { echo "  Codex entrypoints not generated — resolve the reported conflict before using the workflow"; exit 1; }
   fi
 fi
 

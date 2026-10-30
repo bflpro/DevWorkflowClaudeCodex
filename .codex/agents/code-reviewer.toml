@@ -1,3 +1,6 @@
+# workflow-resource-policy: managed model defaults
+model_reasoning_effort = "medium"
+model = "gpt-6.1-terra"
 name = "code-reviewer"
 description = "Review code quality after implementation. Use after completing code tasks to verify quality standards. Proactive: invoke automatically after any code implementation."
-developer_instructions = "Read `.codex/workflow.md` before starting. Then read `.claude/agents/code-reviewer.md` in full, including each skill named in its frontmatter from `.claude/skills/<name>/SKILL.md`. Follow the current source body and its linked references; resolve relative resources beside the source. Treat Claude model/tool names as source metadata and use this session's available tools. Preserve user authorization, ownership, blind-review requirements when independently dispatched, and receipt gates. Source SHA-256: 42ae89dc9b34d20f9891fce774c37768231bf0e8f7424d861181938dbb1310d8."
+developer_instructions = "Read `.codex/workflow.md` before starting. Then read `.claude/agents/code-reviewer.md` in full, including each skill named in its frontmatter from `.claude/skills/<name>/SKILL.md`. Follow the current source body and its linked references; resolve relative resources beside the source. Treat Claude model/tool names as source metadata and use this session's available tools. Preserve user authorization, ownership, blind-review requirements when independently dispatched, and receipt gates. Source SHA-256: 610f8e3e3a272dcb040de3be8c9557014302e95b89425b37b3406f32823ae679."

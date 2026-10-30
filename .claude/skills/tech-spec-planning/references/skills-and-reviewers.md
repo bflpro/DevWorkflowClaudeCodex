@@ -64,6 +64,15 @@ When `reviewers` is `[]` in a task — the lead treats it as `[thorough]`.
 
 Assign `executor` in task frontmatter to route work to the right model/agent and conserve Claude Opus quota.
 
+### Provider-aware resources (2026-10-30)
+
+Read `.claude/shared/workflow-resources/README.md`; `policy.json` is authoritative for
+model/effort by role, including research, specifications, cards, validators and lenses.
+Legacy executor names below are capability hints, not an instruction to switch provider
+or force an inherited model. Resolve the current runtime, role and risk before launch.
+Routine tasks use Sonnet / Terra medium; critical risks use Opus / Sol high. Existing
+stronger explicit assignments remain valid. Inline stages use the actual parent model.
+
 ### Tools available
 
 | Executor | Tool | Best for |

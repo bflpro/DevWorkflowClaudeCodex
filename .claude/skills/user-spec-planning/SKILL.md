@@ -12,6 +12,17 @@ description: |
 
 # User Spec Planning
 
+## Resource and context policy
+
+Before research, drafting, validation or execution, read
+`.claude/shared/workflow-resources/README.md` and resolve the role with
+`.claude/scripts/workflow-route.py`. This shared policy supersedes model names in legacy
+examples below: routine work is Sonnet / Codex Terra medium; risk-triggered work uses the
+critical profile. Do not dispatch every role on the parent model by inheritance. Without
+user-authorized delegation, execute inline, record the current model and self-review
+limitation; a requested assignment does not switch the parent session model. Pass bounded
+paths/questions, reuse one relevant observations brief per phase, and preserve receipt gates.
+
 Thorough adaptive interview → codebase scan → user-spec.md → dual validation → user approval.
 Output: `work/{feature}/user-spec.md` with status `approved`.
 
@@ -82,7 +93,7 @@ Sources in the order of `CLAUDE.md` §4a: Context7, Firecrawl on the vendor docs
 
 ### Phase 3: Code Scanning
 
-Launch `code-researcher` subagent (Task tool, opus) with feature path and feature description from Cycle 1.
+Launch `code-researcher` subagent (resource-policy routine tier; critical only for a named risk) with feature path and feature description from Cycle 1.
 
 After subagent completes — read `{feature_path}/code-research.md`. Use findings in Cycle 2 questions.
 

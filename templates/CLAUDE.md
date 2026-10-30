@@ -55,3 +55,16 @@ Semantic commits (`feat` / `fix` / `chore` / `refactor` / `docs`). Перед к
 python3 .claude/scripts/check-readme.py --changed
 python3 .claude/scripts/check-techspec-readiness.py --changed
 ```
+
+<!-- workflow-resource-policy -->
+## Shared workflow resources
+
+Read `.claude/shared/workflow-resources/README.md` before workflow research, specifications,
+implementation and review. Resolve the current runtime, role and risk with
+`.claude/scripts/workflow-route.py`. Routine roles use Sonnet / Terra medium; critical
+roles use Opus / Sol high; extraction alone uses Haiku / Luna low. Inline phases retain
+the actual parent model and are self-review. User authorization still governs delegation.
+The lead gathers applicable observations once per phase and gives each role a bounded,
+current brief; children do not repeat full session-start scans. Preserve safety checks.
+Acceptance collects lightweight local metrics; absent measurements remain unknown.
+<!-- /workflow-resource-policy -->

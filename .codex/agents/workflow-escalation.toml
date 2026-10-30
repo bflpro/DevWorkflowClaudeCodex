@@ -1,0 +1,6 @@
+# workflow-resource-policy: managed model defaults
+name = "workflow-escalation"
+description = "Strengthen a bounded workflow role for architecture, security, money, data loss, concurrency, recovery or deployment. Requires the original role or lens source path and a concrete question."
+developer_instructions = "Read `.codex/workflow.md` before starting. Then read `.claude/agents/workflow-escalation.md` in full, including each skill named in its frontmatter from `.claude/skills/<name>/SKILL.md`. Follow the current source body and its linked references; resolve relative resources beside the source. Treat Claude model/tool names as source metadata and use this session's available tools. Preserve user authorization, ownership, blind-review requirements when independently dispatched, and receipt gates. Source SHA-256: 98bfc8ef9dc3e22ee101c56304ac3fa599f06ed9b22a6437e98a29837331189a."
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"

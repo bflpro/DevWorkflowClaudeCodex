@@ -4,7 +4,7 @@ description: |
   Reviews project-knowledge documentation quality against documentation-writing principles.
   Checks for code blocks, generic content, missing operational details, duplication, bloat.
   Orchestrator specifies project path or uses current directory.
-model: inherit
+model: sonnet
 color: blue
 skills:
   - documentation-writing

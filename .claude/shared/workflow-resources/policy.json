@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "default_tier": "routine",
+  "tiers": {
+    "routine": {"claude": {"model": "sonnet"}, "codex": {"model": "gpt-6.1-terra", "model_reasoning_effort": "medium"}},
+    "critical": {"claude": {"model": "opus"}, "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high"}},
+    "extraction": {"claude": {"model": "haiku"}, "codex": {"model": "gpt-6-luna", "model_reasoning_effort": "low"}}
+  },
+  "roles": {
+    "code-researcher": "routine",
+    "code-reviewer": "routine",
+    "completeness-validator": "routine",
+    "deploy-reviewer": "critical",
+    "doc-grounder": "routine",
+    "documentation-reviewer": "routine",
+    "infrastructure-reviewer": "routine",
+    "interview-completeness-checker": "routine",
+    "post-deploy-qa": "critical",
+    "pre-deploy-qa": "critical",
+    "prompt-reviewer": "routine",
+    "prose-reviewer": "routine",
+    "reality-checker": "routine",
+    "security-auditor": "critical",
+    "skeptic": "routine",
+    "skill-checker": "routine",
+    "task-creator": "routine",
+    "task-validator": "routine",
+    "tech-spec-validator": "routine",
+    "test-reviewer": "routine",
+    "userspec-adequacy-validator": "critical",
+    "userspec-quality-validator": "routine",
+    "workflow-escalation": "critical",
+    "workflow-extractor": "extraction"
+  },
+  "lenses": {
+    "quick": "routine", "blind-hunter": "routine", "edge-case-hunter": "routine",
+    "verification-gap": "routine", "intent-alignment": "routine",
+    "security": "critical", "prod-readiness": "critical"
+  },
+  "critical_risks": ["security", "money", "data-loss", "recovery", "concurrency", "architecture", "deployment"],
+  "collection": {"max_tasks": 500, "retention_days": 90, "report_every_tasks": 10, "report_every_days": 7, "max_runs_per_task": 100, "max_json_bytes": 1048576}
+}

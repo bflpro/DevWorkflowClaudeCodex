@@ -19,6 +19,13 @@
 
 ## Конверт отчёта
 
+Перед запуском прочитай `.claude/shared/workflow-resources/README.md` и вызови resolver для
+имени линзы. Обычные линзы: Sonnet / Terra medium; security и prod-readiness: Opus / Sol high.
+Повышенный риск усиливает и обычную линзу, сохраняя её reviewer и формат отчёта.
+Без разрешения на делегирование — inline и честная отметка самопроверки. После patch действует
+§5 triage.md: проверка исправления и обязательные тесты, без автоматического полного
+повторного набора линз. Сбор метрик выполняет task-accept.py без дополнительного LLM.
+
 `{feature_dir}/logs/working/task-{N}/{lens}-{round}.json`:
 
 ```json

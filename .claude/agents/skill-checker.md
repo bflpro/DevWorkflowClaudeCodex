@@ -3,7 +3,7 @@ name: skill-checker
 description: |
   Validates skills against quality standards from skill-master.
   Use after creating or modifying a skill to check compliance.
-model: inherit
+model: sonnet
 color: yellow
 skills:
   - skill-master

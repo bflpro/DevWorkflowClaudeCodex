@@ -11,6 +11,17 @@ description: |
 
 # Tech Spec Planning
 
+## Resource and context policy
+
+Before research, drafting, validation or execution, read
+`.claude/shared/workflow-resources/README.md` and resolve the role with
+`.claude/scripts/workflow-route.py`. This shared policy supersedes model names in legacy
+examples below: routine work is Sonnet / Codex Terra medium; risk-triggered work uses the
+critical profile. Do not dispatch every role on the parent model by inheritance. Without
+user-authorized delegation, execute inline, record the current model and self-review
+limitation; a requested assignment does not switch the parent session model. Pass bounded
+paths/questions, reuse one relevant observations brief per phase, and preserve receipt gates.
+
 Create technical specification through code research, adaptive clarification, and multi-validator review.
 
 **Input:** `work/{feature}/user-spec.md` + Project Knowledge
@@ -35,7 +46,7 @@ Create technical specification through code research, adaptive clarification, an
 
 ## Phase 2: Code Research
 
-Launch `code-researcher` subagent (Task tool, opus) with feature path and user-spec path. The agent reads existing `code-research.md` (from user-spec phase if available) and deepens analysis for implementation.
+Launch `code-researcher` subagent (resource-policy routine tier; critical only for a named risk) with feature path and user-spec path. The agent reads existing `code-research.md` (from user-spec phase if available) and deepens analysis for implementation.
 
 After subagent completes — read `{feature_path}/code-research.md`. Use in Phase 3 clarification and Phase 4 spec writing.
 

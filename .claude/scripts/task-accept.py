@@ -85,8 +85,9 @@ def run_commands(cmds: list[dict], cwd: Path, timeout: int) -> list[dict]:
     results = []
     for c in cmds:
         try:
-            proc = subprocess.run(c["command"], shell=True, cwd=str(cwd), capture_output=True,
-                                  text=True, timeout=timeout)
+            # Verification Steps explicitly contain trusted, reviewed shell commands.
+            proc = subprocess.run(c["command"], shell=True, cwd=str(cwd), capture_output=True,  # noqa: S602
+                                  text=True, timeout=timeout, check=False)
             exit_code, output = proc.returncode, (proc.stdout + proc.stderr)[-2000:]
         except subprocess.TimeoutExpired:
             exit_code, output = None, f"timeout after {timeout}s"
@@ -213,6 +214,17 @@ def main(argv: list[str] | None = None) -> int:
         "generated_at": now_iso(),
     }
     write_json(receipts_dir / "acceptance.json", receipt)
+
+    # Optional local telemetry must never alter the acceptance verdict or receipt.
+    try:
+        metrics = _load_module("workflow-metrics")
+        result = metrics.collect(args.feature_dir.resolve(), task.number, receipt, root=repo)
+        if result["input_errors"]:
+            print("workflow-metrics: incomplete evidence; see local report coverage", file=sys.stderr)
+        if result["report_updated"] and not args.quiet:
+            print("workflow-metrics: periodic report updated in .claude/state/workflow-metrics/report.md")
+    except Exception:
+        print("workflow-metrics: collection unavailable; acceptance verdict unchanged", file=sys.stderr)
 
     if not args.quiet:
         verdict = "ACCEPTED" if accepted else "NOT ACCEPTED"

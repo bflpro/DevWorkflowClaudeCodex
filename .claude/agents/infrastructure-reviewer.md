@@ -4,7 +4,7 @@ description: |
   Reviews infrastructure setup quality: folder structure, pre-commit hooks,
   Docker config, testing setup, .gitignore security.
   Orchestrator specifies what to check and provides file paths.
-model: inherit
+model: sonnet
 color: orange
 skills:
   - infrastructure-setup

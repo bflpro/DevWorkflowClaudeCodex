@@ -6,7 +6,7 @@ description: |
   task brevity, decisions placement. Security, adequacy, testing strategy,
   and code mirage detection handled by dedicated validators.
   Use before creating task files to ensure tech-spec is ready for implementation.
-model: inherit
+model: sonnet
 color: yellow
 allowed-tools: Read, Glob, Grep, Write
 ---

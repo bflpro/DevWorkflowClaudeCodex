@@ -9,7 +9,7 @@ description: |
   during /decompose-tech-spec or manual task creation from tech-spec.
   Also used in fix mode: receives existing task + validator findings, applies fixes.
   Scope excludes: validating tasks (use task-validator).
-model: inherit
+model: sonnet
 color: green
 allowed-tools: Read, Glob, Grep, Write, Bash, Edit
 ---

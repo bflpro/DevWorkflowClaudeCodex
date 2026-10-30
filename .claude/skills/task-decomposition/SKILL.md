@@ -9,6 +9,17 @@ description: |
 
 # Task Decomposition
 
+## Resource and context policy
+
+Before research, drafting, validation or execution, read
+`.claude/shared/workflow-resources/README.md` and resolve the role with
+`.claude/scripts/workflow-route.py`. This shared policy supersedes model names in legacy
+examples below: routine work is Sonnet / Codex Terra medium; risk-triggered work uses the
+critical profile. Do not dispatch every role on the parent model by inheritance. Without
+user-authorized delegation, execute inline, record the current model and self-review
+limitation; a requested assignment does not switch the parent session model. Pass bounded
+paths/questions, reuse one relevant observations brief per phase, and preserve receipt gates.
+
 Decompose tech-spec Implementation Tasks into individual task files with parallel creation and validation.
 
 **Input:** `work/{feature}/tech-spec.md` (status: approved)

@@ -4,3 +4,4 @@ __pycache__/
 .codex/data/
 .workflow-backup/
 work/*/logs/working/
+.claude/state/

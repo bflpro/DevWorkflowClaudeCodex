@@ -74,6 +74,18 @@ def agent_content(root, target, source):
     settings = tomllib.loads(existing) if existing else {}
     settings["name"] = source.stem
     settings["description"] = field(source.read_text(), "description", source.stem)
+    policy_path = root / ".claude/shared/workflow-resources/policy.json"
+    managed = "# workflow-resource-policy: managed model defaults"
+    defaults = {}
+    if policy_path.exists():
+        policy = json.loads(policy_path.read_text())
+        tier = policy["roles"][source.stem]
+        defaults = policy["tiers"][tier]["codex"]
+    # Preserve unmarked local model/effort overrides. Mark only fields owned together.
+    manage_models = bool(defaults) and (managed in existing or not any(
+        key in settings for key in ("model", "model_reasoning_effort")))
+    if manage_models:
+        settings.update(defaults)
     source_rel = source.relative_to(root).as_posix()
     settings["developer_instructions"] = (
         "Read `.codex/workflow.md` before starting. Then read "
@@ -104,12 +116,23 @@ def agent_content(root, target, source):
                 text,
                 flags=re.M,
             )
+        if manage_models:
+            for key, value in defaults.items():
+                replacement = f"{key} = {json.dumps(value)}"
+                if key in tomllib.loads(text):
+                    text = re.sub(rf'^{key}\s*=.*$', lambda _, value=replacement: value, text, flags=re.M)
+                else:
+                    # Root keys must precede nested TOML tables.
+                    text = replacement + "\n" + text
+            if managed not in text:
+                text = managed + "\n" + text
         tomllib.loads(text)
         return text
-    return "\n".join(
+    text = "\n".join(
         f"{key} = {json.dumps(settings[key], ensure_ascii=False)}"
-        for key in ("name", "description", "developer_instructions")
+        for key in ("name", "description", "developer_instructions", *defaults.keys())
     ) + "\n"
+    return (managed + "\n" + text) if manage_models else text
 
 
 def guard_target(root, target):
@@ -237,6 +260,9 @@ def sync(root, write=False, adopt=False):
         "adapter_sha256": digest((root / ".codex/workflow.md").read_bytes()),
         "targets": {name: record for name, (_, record) in entries.items()},
     }
+    policy_path = root / ".claude/shared/workflow-resources/policy.json"
+    if policy_path.exists():
+        manifest["resource_policy_sha256"] = digest(policy_path.read_bytes())
     manifest_data = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()
     if not manifest_path.exists() or manifest_path.read_bytes() != manifest_data:
         changes.append(MANIFEST)
@@ -277,6 +303,9 @@ def check_staged(root):
     adapter = read_index(".codex/workflow.md")
     if adapter is None or digest(adapter) != staged["adapter_sha256"]:
         problems.append("Index differs from manifest: .codex/workflow.md")
+    policy = read_index(".claude/shared/workflow-resources/policy.json")
+    if (digest(policy) if policy is not None else None) != staged.get("resource_policy_sha256"):
+        problems.append("Index differs from manifest: .claude/shared/workflow-resources/policy.json")
     return problems
 
 
