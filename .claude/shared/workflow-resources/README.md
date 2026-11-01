@@ -1,4 +1,4 @@
-# Workflow resources: Claude and Codex
+# Workflow resources: Claude, Codex and ZCode
 
 This policy governs resource selection, bounded context and local feedback for the shared development workflow. Criteria, task ownership and acceptance remain in their existing sources. Model assignments are a pilot based on the October audit, not a claim of measured quality equivalence.
 
@@ -24,7 +24,7 @@ python3 .claude/scripts/workflow-route.py code-reviewer --runtime codex --risk m
 python3 .claude/scripts/workflow-route.py implementation --runtime claude
 ```
 
-`policy.json` is the shared assignment source. Routine research, specification drafts, cards and semantic validators use Terra/medium in Codex, Sonnet in Claude. Security, deployment/QA and adequacy roles use Sol/high or Opus. Architecture, money, data loss, concurrency and recovery strengthen otherwise routine work. Mechanical checks use existing scripts. Luna/low or Haiku is limited to extraction/summarization, never semantic approval, security review, finding closure or acceptance. Do not introduce an LLM classifier before every operation.
+`policy.json` is the shared assignment source. Routine research, specification drafts, cards and semantic validators use Terra/medium in Codex, Sonnet in Claude, GLM-5.3/high in ZCode. Security, deployment/QA and adequacy roles use Sol/high, Opus, or GLM-5.3/max in ZCode. Architecture, money, data loss, concurrency and recovery strengthen otherwise routine work. Mechanical checks use existing scripts. Luna/low, Haiku, or GLM-5.3-Flash/low in ZCode is limited to extraction/summarization, never semantic approval, security review, finding closure or acceptance. Do not introduce an LLM classifier before every operation.
 
 The resolver returns **requested** settings, never evidence of the model that ran. For an unknown role or risk it fails instead of silently downgrading. A failed or contradictory routine result gets one bounded investigation; unresolved invariants or demonstrated capability gaps use the critical profile, with the reason recorded. Repeated escalation is a signal for the periodic report, not an automatic full pipeline restart. Do not silently fall back to an unavailable model or effort: record the limitation and use a supported, explicit assignment; never describe unavailable checks as passed.
 
@@ -33,6 +33,8 @@ If a newly added custom profile is not exposed by the current tool, reload the s
 For Codex custom roles the generated TOML settings take precedence over spawn overrides. Use the returned `workflow-escalation` agent type, supply the original role/lens source path and exact output schema, rather than trying to override a fixed Terra role. Routine generic lenses use the returned requested settings. Security/prod-readiness use critical resources. Never change the `reviewer` identity or findings schema merely because the execution profile changes. Marked generated model fields track policy; unmarked local overrides are preserved by sync. To retain a reviewed local override, remove the managed marker, set the fields, then run sync check/write and inspect the diff.
 
 Claude uses explicit `model` in role frontmatter and the resolver's model for generic agents. Existing `executor` metadata is not a provider switch: a Codex session resolves a Codex model, a Claude session resolves a Claude model. Preserve an explicitly approved stronger assignment; remove blanket Opus launches for routine work. Legacy executor hints never authorize invoking another provider or external service. Effort names from Codex are not copied to Claude.
+
+ZCode uses `model` plus `thoughtLevel` (`low`/`high`/`max`) in `.zcode/agents/*.md` frontmatter, generated from this policy. Agent files carry bare model ids (`GLM-5.3`, `GLM-5.3-Flash`); if the client requires an account-qualified id and does not resolve a bare one, remove the `model` key so the agent inherits the session model and record the limitation. The ZCode `.zcode/` tree holds full adapted copies (no generator): a change in `.claude/skills|commands|agents` is mirrored into `.zcode/` in the same commit — see `.zcode/README.md`.
 
 **Authorization:** only delegate when the user has authorized it. Otherwise execute inline with the selected session model, record the requested/actual mismatch and call the check self-review. Custom-agent files do not switch the parent session model. Select a new parent model through the client's supported controls at a phase boundary; never claim to have changed it via text. Restart the client/session to reload discovery settings when required.
 

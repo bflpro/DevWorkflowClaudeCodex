@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "enabled": true,
+    "events": {
+      "PreToolUse": [
+        {
+          "matcher": "^(Bash|Write|Edit|MultiEdit|NotebookEdit|ApplyPatch)$",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "python3 \"${ZCODE_PROJECT_DIR}/.zcode/hooks/workflow-hooks.py\" pre-tool-use",
+              "timeout": 8
+            }
+          ]
+        }
+      ],
+      "SessionStart": [
+        {
+          "matcher": "^(startup|resume|clear|compact)$",
+          "hooks": [
+            {
+              "type": "command",
+              "command": "python3 \"${ZCODE_PROJECT_DIR}/.zcode/hooks/workflow-hooks.py\" session-start",
+              "timeout": 8
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

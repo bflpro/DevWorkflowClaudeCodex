@@ -93,6 +93,24 @@ else
 fi
 
 echo
+echo "4b. Рантайм для ZCode"
+if [ -d "$REPO_DIR/.zcode" ] && [ -f "$REPO_DIR/.zcode/adapt-zcode.py" ]; then
+  if (cd "$REPO_DIR" && python3 .zcode/adapt-zcode.py --check >/dev/null 2>&1); then
+    green ".zcode совпадает с .claude"
+  else
+    yellow ".zcode расходится с .claude — подробности:
+        python3 .zcode/adapt-zcode.py --check"
+  fi
+  if python3 -c 'import json,sys; c=json.load(open(sys.argv[1])); sys.exit(0 if c.get("hooks",{}).get("enabled") else 1)' "$REPO_DIR/.zcode/config.json" 2>/dev/null; then
+    green "хуки ZCode включены (.zcode/config.json)"
+  else
+    yellow "хуки ZCode не включены — проверь hooks.enabled в .zcode/config.json"
+  fi
+else
+  green ".zcode не установлен — пропуск"
+fi
+
+echo
 echo "5. Ссылки на скиллы, агентов, линзы и команды (check-refs.py)"
 echo "   (ссылка только в ~/.claude — у коллеги на другой машине её нет)"
 if [ -f "$REPO_DIR/.claude/scripts/check-refs.py" ] && command -v python3 >/dev/null 2>&1; then

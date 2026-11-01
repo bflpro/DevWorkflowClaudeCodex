@@ -2,9 +2,45 @@
   "version": 1,
   "default_tier": "routine",
   "tiers": {
-    "routine": {"claude": {"model": "sonnet"}, "codex": {"model": "gpt-6.1-terra", "model_reasoning_effort": "medium"}},
-    "critical": {"claude": {"model": "opus"}, "codex": {"model": "gpt-6.1-sol", "model_reasoning_effort": "high"}},
-    "extraction": {"claude": {"model": "haiku"}, "codex": {"model": "gpt-6-luna", "model_reasoning_effort": "low"}}
+    "routine": {
+      "claude": {
+        "model": "sonnet"
+      },
+      "codex": {
+        "model": "gpt-6.1-terra",
+        "model_reasoning_effort": "medium"
+      },
+      "zcode": {
+        "model": "GLM-5.3",
+        "thoughtLevel": "high"
+      }
+    },
+    "critical": {
+      "claude": {
+        "model": "opus"
+      },
+      "codex": {
+        "model": "gpt-6.1-sol",
+        "model_reasoning_effort": "high"
+      },
+      "zcode": {
+        "model": "GLM-5.3",
+        "thoughtLevel": "max"
+      }
+    },
+    "extraction": {
+      "claude": {
+        "model": "haiku"
+      },
+      "codex": {
+        "model": "gpt-6-luna",
+        "model_reasoning_effort": "low"
+      },
+      "zcode": {
+        "model": "GLM-5.3-Flash",
+        "thoughtLevel": "low"
+      }
+    }
   },
   "roles": {
     "code-researcher": "routine",
@@ -33,10 +69,29 @@
     "workflow-extractor": "extraction"
   },
   "lenses": {
-    "quick": "routine", "blind-hunter": "routine", "edge-case-hunter": "routine",
-    "verification-gap": "routine", "intent-alignment": "routine",
-    "security": "critical", "prod-readiness": "critical"
+    "quick": "routine",
+    "blind-hunter": "routine",
+    "edge-case-hunter": "routine",
+    "verification-gap": "routine",
+    "intent-alignment": "routine",
+    "security": "critical",
+    "prod-readiness": "critical"
   },
-  "critical_risks": ["security", "money", "data-loss", "recovery", "concurrency", "architecture", "deployment"],
-  "collection": {"max_tasks": 500, "retention_days": 90, "report_every_tasks": 10, "report_every_days": 7, "max_runs_per_task": 100, "max_json_bytes": 1048576}
+  "critical_risks": [
+    "security",
+    "money",
+    "data-loss",
+    "recovery",
+    "concurrency",
+    "architecture",
+    "deployment"
+  ],
+  "collection": {
+    "max_tasks": 500,
+    "retention_days": 90,
+    "report_every_tasks": 10,
+    "report_every_days": 7,
+    "max_runs_per_task": 100,
+    "max_json_bytes": 1048576
+  }
 }

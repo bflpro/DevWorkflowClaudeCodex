@@ -7,13 +7,14 @@
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET="$PWD"; CODEX=0; FORCE=0; DRY=0
+TARGET="$PWD"; CODEX=0; ZCODE=0; FORCE=0; DRY=0
 
 usage() { sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
 while [ $# -gt 0 ]; do
   case "$1" in
     --target) TARGET="${2:?--target needs a directory}"; shift 2 ;;
     --codex) CODEX=1; shift ;;
+    --zcode) ZCODE=1; shift ;;
     --force) FORCE=1; shift ;;
     --dry-run) DRY=1; shift ;;
     -h|--help) usage 0 ;;
@@ -108,15 +109,16 @@ done
 
 # --- .gitignore: runtime data of the workflow -------------------------------
 GI="$TARGET/.gitignore"
-for line in 'work/*/logs/working/' '.codex/data/' '.claude/state/' '.workflow-backup/' '__pycache__/'; do
+for line in 'work/*/logs/working/' '.codex/data/' '.zcode/data/' '.claude/state/' '.workflow-backup/' '__pycache__/'; do
   if ! { [ -e "$GI" ] && grep -qxF "$line" "$GI"; }; then
     if [ "$DRY" -eq 1 ]; then echo "  [dry-run] .gitignore += $line"; else echo "$line" >> "$GI"; fi
   fi
 done
 
-# Append the policy to existing project rules and merge only absent Codex defaults.
+# Append the policy to existing project rules and merge only absent runtime defaults.
 resource_args=("$TARGET")
 [ "$CODEX" -eq 1 ] && resource_args+=(--codex)
+[ "$ZCODE" -eq 1 ] && resource_args+=(--zcode)
 [ "$DRY" -eq 1 ] && resource_args+=(--dry-run)
 python3 "$SRC/tools/configure-resources.py" "${resource_args[@]}"
 
@@ -137,6 +139,20 @@ if [ "$CODEX" -eq 1 ]; then
   fi
 fi
 
+# --- ZCode ------------------------------------------------------------------
+if [ "$ZCODE" -eq 1 ]; then
+  for f in workflow.md README.md adapt-zcode.py config.json .gitignore \
+           hooks/workflow-hooks.py hooks/README.md; do
+    place ".zcode/$f"
+  done
+  if [ "$DRY" -eq 1 ]; then
+    echo "  [dry-run] python3 .zcode/adapt-zcode.py --write"
+  else
+    (cd "$TARGET" && python3 .zcode/adapt-zcode.py --write) \
+      || { echo "  ZCode runtime not generated — resolve the reported error before using the workflow"; exit 1; }
+  fi
+fi
+
 # --- report -----------------------------------------------------------------
 echo
 echo "Done: added $added, unchanged $same, replaced $replaced, kept local $kept."
@@ -153,4 +169,5 @@ fi
 echo
 echo "Next: open the project in Claude Code and run /build <task> or /new-user-spec."
 [ "$CODEX" -eq 1 ] && echo "Codex: start a new session, trust the project, check /hooks; use \$source-command-build."
+[ "$ZCODE" -eq 1 ] && echo "ZCode: open the project, check /menu commands and Settings → Skills/Subagents; run /build <task>."
 exit 0

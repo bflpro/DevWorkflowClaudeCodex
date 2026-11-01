@@ -29,6 +29,10 @@ jobs:
         run: python3 -m unittest discover -s .codex -p 'test_*.py'
       - name: Codex entrypoints in sync
         run: python3 .codex/sync-workflow.py --check
+      - name: ZCode runtime tests
+        run: python3 -m unittest discover -s .zcode -p 'test_*.py'
+      - name: ZCode runtime in sync
+        run: python3 .zcode/adapt-zcode.py --check
       - name: Resource installation tests
         run: python3 -m unittest discover -s tools -p 'test_*.py'
       - name: Install smoke test
@@ -36,9 +40,12 @@ jobs:
           git config --global user.email ci@example.com
           git config --global user.name ci
           proj="$(mktemp -d)"; git -C "$proj" init -q
-          bash install.sh --target "$proj" --codex
+          bash install.sh --target "$proj" --codex --zcode
           test -f "$proj/.claude/scripts/task-accept.py"
           test -f "$proj/.agents/skills/source-command-build/SKILL.md"
           test -f "$proj/.codex/agents/code-reviewer.toml"
-          bash install.sh --target "$proj" --codex | tee second.log
+          test -f "$proj/.zcode/skills/build-route/SKILL.md"
+          test -f "$proj/.zcode/commands/build.md"
+          grep -q "model: GLM-5.3" "$proj/.zcode/agents/code-reviewer.md"
+          bash install.sh --target "$proj" --codex --zcode | tee second.log
           grep -q "added 0," second.log

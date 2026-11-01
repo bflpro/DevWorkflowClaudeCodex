@@ -10,8 +10,8 @@ POLICY = Path(__file__).resolve().parents[1] / "shared/workflow-resources/policy
 
 def resolve(role, runtime, risks=(), policy=None):
     policy = policy or json.loads(POLICY.read_text())
-    if runtime not in ("claude", "codex"):
-        raise ValueError("runtime must be claude or codex")
+    if runtime not in ("claude", "codex", "zcode"):
+        raise ValueError("runtime must be claude, codex or zcode")
     names = {**policy["roles"], **policy["lenses"]}
     # Unknown roles must be explicitly classified, never silently downgraded.
     if role not in names and role not in (
@@ -52,7 +52,7 @@ def resolve(role, runtime, risks=(), policy=None):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("role")
-    ap.add_argument("--runtime", choices=("claude", "codex"), required=True)
+    ap.add_argument("--runtime", choices=("claude", "codex", "zcode"), required=True)
     ap.add_argument("--risk", action="append", default=[])
     args = ap.parse_args()
     try:

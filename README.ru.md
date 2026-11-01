@@ -2,7 +2,7 @@
 
 [English](README.md) · **Русский**
 
-Процесс разработки для Claude Code и Codex, который ставится в любой репозиторий: от идеи
+Процесс разработки для Claude Code, Codex и ZCode (GLM), который ставится в любой репозиторий: от идеи
 через спецификации и задачи к коду, ревью и приёмке. Каждый шаг закрыт проверкой, которую
 делает скрипт, а не слово модели: задача считается готовой только по квитанции, исполнитель не
 может выйти за свои файлы, ревьюер не видит рассказа исполнителя о том, «как всё хорошо».
@@ -46,6 +46,7 @@ git clone https://github.com/bflpro/DevWorkflowClaudeCodex.git
 cd DevWorkflowClaudeCodex
 ./install.sh --target /путь/к/проекту            # Claude Code
 ./install.sh --target /путь/к/проекту --codex    # + Codex
+./install.sh --target /путь/к/проекту --zcode    # + ZCode (GLM)
 ```
 
 Флаги: `--dry-run` показывает, что будет сделано, ничего не меняя; `--force` заменяет
@@ -53,7 +54,9 @@ cd DevWorkflowClaudeCodex
 
 После установки откройте проект в Claude Code и запустите `/build <задача>` или
 `/new-user-spec`. В Codex — новая сессия, доверить проект, проверить `/hooks`, вызывать
-`$source-command-build`.
+`$source-command-build`. В ZCode — открыть проект, проверить команды в меню `/` и
+Settings → Skills/Subagents, запускать `/build <задача>`: скиллы, команды и субагенты
+обнаруживаются нативно из `.zcode/`.
 
 ## Что ставится в проект
 
@@ -68,7 +71,8 @@ cd DevWorkflowClaudeCodex
 | `.claude/settings.json` | два хука: рефлексы и восстановление контекста после сжатия; в существующий файл хуки **дописываются** |
 | `CLAUDE.md`, `AGENTS.md`, `ENGINEERING.md` | правила проекта — только если их ещё нет |
 | `.codex/`, `.agents/skills/` | с `--codex`: адаптер и сгенерированные входные точки |
-| `.gitignore` | `work/*/logs/working/`, `.codex/data/`, `.workflow-backup/` |
+| `.zcode/` | с `--zcode`: рантайм ZCode — скиллы, slash-команды, GLM-агенты, хуки в `.zcode/config.json` и генератор `adapt-zcode.py` |
+| `.gitignore` | `work/*/logs/working/`, `.codex/data/`, `.zcode/data/`, `.workflow-backup/` |
 
 `ENGINEERING.md` содержит разделы «заполнить» (стек, деплой) — заполните их под свой проект:
 на остальные разделы по номерам ссылаются скиллы, нумерацию не меняйте.
@@ -78,8 +82,13 @@ cd DevWorkflowClaudeCodex
 - **Ставится в проект, а не в `~/.claude`.** Скиллы и гейты вызывают `.claude/scripts/…` и
   `.claude/shared/…` от корня проекта, и методика едет вместе с репозиторием: у коллеги после
   `git clone` тот же процесс. Глобальная установка ломала бы эти пути на чужой машине.
-- **Одна методика на два инструмента.** Codex не получает копию скиллов: генератор
+- **Одна методика на несколько инструментов.** Codex не получает копию скиллов: генератор
   `.codex/sync-workflow.py` пишет короткие входные точки, которые читают оригинал из `.claude/`.
+- **ZCode получает полные копии — осознанно.** ZCode нативно обнаруживает скиллы, команды и
+  субагентов из `.zcode/` (имена команд те же, что в Claude Code), поэтому `.zcode/` хранит
+  полные адаптированные копии, которые генерирует `.zcode/adapt-zcode.py` из `.claude/`;
+  дрейф ловит `--check` в CI. Гейты, шаблоны, рефлексы и политика ресурсов остаются общими
+  в `.claude/`.
   Копии расходятся; ссылки — нет. Хеши в манифесте ловят ручную правку и устаревание.
 - **Готовность — по квитанции.** Отчёт исполнителя и зелёный выход процесса — не доказательство;
   `task-accept.py` сам перезапускает проверки и пишет `acceptance.json`.
@@ -98,7 +107,7 @@ cd DevWorkflowClaudeCodex
 
 ```bash
 cd DevWorkflowClaudeCodex && git pull
-./install.sh --target /путь/к/проекту [--codex]
+./install.sh --target /путь/к/проекту [--codex] [--zcode]
 ```
 
 Файлы, которые вы не меняли, обновятся; изменённые останутся вашими и будут перечислены —
@@ -111,6 +120,7 @@ cd DevWorkflowClaudeCodex && git pull
 bash .claude/scripts/check-setup.sh            # хуки, интерпретаторы, скрипты на месте, ссылки резолвятся
 python3 .claude/scripts/receipts-stats.py      # сколько задач прошло ревью с первого раза
 python3 .codex/sync-workflow.py --check        # входные точки Codex соответствуют .claude/
+python3 .zcode/adapt-zcode.py --check          # рантайм ZCode соответствует .claude/
 ```
 
 - `/new-user-spec` пишет `template not found` — неполный `.claude/shared/`; переустановите.
@@ -127,10 +137,13 @@ bash tools/check-clean.sh                                              # сто�
 python3 -m unittest discover -s .claude/scripts/tests -t .claude/scripts/tests
 python3 -m unittest discover -s .codex -p 'test_*.py'
 python3 .codex/sync-workflow.py --check
+python3 -m unittest discover -s .zcode -p 'test_*.py'
+python3 .zcode/adapt-zcode.py --check
 ```
 
 То же гоняет CI (`.github/workflows/check.yml`) вместе с пробной установкой в пустой репозиторий.
-Изменили скилл, команду или агента — перегенерируйте входные точки Codex (`--write`) тем же коммитом.
+Изменили скилл, команду или агента — перегенерируйте входные точки Codex (`--write`) и рантайм
+ZCode (`python3 .zcode/adapt-zcode.py --write`) тем же коммитом.
 
 ## Сторонние материалы
 
@@ -148,8 +161,8 @@ MIT — см. [LICENSE](LICENSE).
 ## Модели, лёгкий сбор и обновление других компьютеров
 
 Для обычных исследований, спек, карточек и ревью: Sonnet в Claude, GPT-6.1 Terra / medium
-в Codex. Для повышенного риска: Opus или GPT-6.1 Sol / high. Только извлечение фактов:
-Haiku или GPT-6 Luna / low. Это пилотные назначения; качество и экономия проверяются по
+в Codex или GLM-5.3 / high в ZCode. Для повышенного риска: Opus, GPT-6.1 Sol / high или
+GLM-5.3 / max. Только извлечение фактов: Haiku, GPT-6 Luna / low или GLM-5.3-Flash / low. Это пилотные назначения; качество и экономия проверяются по
 реальной работе. [Общая политика и формат измерений](.claude/shared/workflow-resources/README.md).
 Модель главной сессии выбирается отдельно; после установки начни новую сессию агента.
 
@@ -162,7 +175,7 @@ Haiku или GPT-6 Luna / low. Это пилотные назначения; к�
 
 На другом компьютере **в том же проекте** достаточно получить закоммиченные файлы через
 `git pull --ff-only` и начать новую сессию. Домашние настройки и runtime-метрики не копируются.
-В другом проекте запускай install.sh с --codex. Для старой установки сначала --dry-run:
+В другом проекте запускай install.sh с --codex и/или --zcode. Для старой установки сначала --dry-run:
 различающиеся файлы сохраняются; их нужно сверить и слить либо явно применить --force
 с резервным копированием оригиналов. Новые файлы при сохранённых старых шагах исполнения
 ещё не означают полное обновление workflow.

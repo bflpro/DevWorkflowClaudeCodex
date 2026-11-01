@@ -104,6 +104,44 @@ class InstallTests(unittest.TestCase):
                 0,
             )
 
+    def test_zcode_install_generates_runtime_and_merges_user_config(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            (root / ".zcode").mkdir()
+            (root / ".zcode/config.json").write_text(
+                json.dumps({"mcp": {"servers": {"mine": {"type": "stdio", "command": "mine"}}}})
+            )
+            (root / "AGENTS.md").write_text("# Project rules\nKeep mine.\n")
+            for _ in range(2):
+                result = subprocess.run(
+                    ["bash", str(ROOT / "install.sh"), "--target", str(root), "--zcode"],
+                    capture_output=True, text=True, timeout=90, check=False,
+                )
+                self.assertEqual(
+                    result.returncode, 0, result.stdout[-3000:] + result.stderr[-1000:]
+                )
+            self.assertIn("added 0,", result.stdout)
+            self.assertTrue((root / ".zcode/skills/build-route/SKILL.md").exists())
+            self.assertTrue((root / ".zcode/commands/build.md").exists())
+            reviewer = (root / ".zcode/agents/code-reviewer.md").read_text()
+            self.assertIn("model: GLM-5.3", reviewer)
+            self.assertIn("thoughtLevel: high", reviewer)
+            agents_md = (root / "AGENTS.md").read_text()
+            self.assertIn(agents_md.splitlines()[0], "# Project rules")
+            self.assertIn("<!-- workflow-zcode -->", agents_md)
+            config = json.loads((root / ".zcode/config.json").read_text())
+            self.assertEqual(config["mcp"]["servers"]["mine"]["command"], "mine")
+            self.assertTrue(config["hooks"]["enabled"])
+            self.assertIn("PreToolUse", config["hooks"]["events"])
+            self.assertEqual(
+                subprocess.run(
+                    ["python3", ".zcode/adapt-zcode.py", "--check"],
+                    cwd=root, capture_output=True, check=False,
+                ).returncode,
+                0,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

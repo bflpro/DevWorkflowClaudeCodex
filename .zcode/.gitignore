@@ -1,0 +1,4 @@
+data/
+__pycache__/
+hooks/__pycache__/
+plans/
