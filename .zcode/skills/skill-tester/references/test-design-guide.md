@@ -104,7 +104,7 @@ complex procedural skills can have 15+.
 
 Default persona (do not change unless user explicitly asks):
 
-> Предприниматель, занимается vibe-coding через Claude Code. Не программист —
+> Предприниматель, занимается vibe-coding через Claude Code или ZCode. Не программист —
 > не знает синтаксис, библиотеки, алгоритмы. Есть техническое образование,
 > понимает продукты и архитектуру на уровне "что делает что". Общается прямо,
 > без воды.

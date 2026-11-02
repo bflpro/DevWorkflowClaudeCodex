@@ -12,7 +12,6 @@ templates, reflexes and the resource policy stay in .claude/ and are never copie
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -44,41 +43,26 @@ GLOBAL_RULES: list[tuple[str, str]] = [
 FILE_RULES: dict[str, list[tuple[str, str]]] = {
     "skills/feature-execution/SKILL.md": [
         (
-            "     Check if `~/.claude/teams/{team_name}/config.json` exists: if yes, team is alive; if no,\n"
-            "     recreate via TeamCreate. Skip to Phase 2 starting from `next_wave`.",
-            "     Executors spawned before the compaction may be gone: check the session's task list\n"
-            "     (`/tasks`) for still-running agents; a missing executor is re-spawned fresh with the\n"
-            "     same card (its `start_commit` keeps ownership verifiable). Skip to Phase 2 starting\n"
-            "     from `next_wave`.",
+            "     Check if `~/.claude/teams/{team_name}/config.json` exists: if yes, team is alive; if no,\n     recreate via TeamCreate. Skip to Phase 2 starting from `next_wave`.",
+            "     Executors spawned before the compaction may be gone: check the session's task list\n     (`/tasks`) for still-running agents; a missing executor is re-spawned fresh with the\n     same card (its `start_commit` keeps ownership verifiable). Skip to Phase 2 starting\n     from `next_wave`.",
         ),
         ("6. Create team via TeamCreate",
-         "6. Note the dispatch convention: one background subagent per task (Agent tool,\n"
-         "   `run_in_background: true`); keep every spawn result's agent id for SendMessage"),
+         "6. Note the dispatch convention: one background subagent per task (Agent tool,\n   `run_in_background: true`); keep every spawn result's agent id for SendMessage"),
         ("**Checkpoint:** execution plan approved, team created, checkpoint initialized.",
          "**Checkpoint:** execution plan approved, dispatch convention set, checkpoint initialized."),
         (
             '   **Teammate** — `subagent_type: "general-purpose"`, `model: <resolved Claude model>`, `team_name: "{team}"`; resolve implementation/skill and risk through the resource policy. Codex uses its adapter and resolved model/effort.',
-            "   **Subagent** — Agent tool, `subagent_type: \"general-purpose\"`, `run_in_background: true`,\n"
-            "   model/thoughtLevel from the card's `executor` resolved via\n"
-            "   `workflow-route.py --runtime zcode` (glm-max → GLM-5.3/max, glm-high → GLM-5.3/high,\n"
-            "   glm-flash → GLM-5.3-Flash/low); resolve skill and risk through the resource policy.",
+            "   **Subagent** — Agent tool, `subagent_type: \"general-purpose\"`, `run_in_background: true`,\n   model/thoughtLevel from the card's `executor` resolved via\n   `workflow-route.py --runtime zcode` (glm-max → GLM-5.3/max, glm-high → GLM-5.3/high,\n   glm-flash → GLM-5.3-Flash/low); resolve skill and risk through the resource policy.",
         ),
         (
-            "   If the task requires user actions — send the instruction to lead via SendMessage.\n"
-            "   Lead will forward to user and return confirmation.",
-            "   If the task requires user actions — include the instruction request in your completion\n"
-            "   report; the lead forwards it to the user and returns the confirmation by SendMessage to\n"
-            "   your agent id.",
+            "   If the task requires user actions — send the instruction to lead via SendMessage.\n   Lead will forward to user and return confirmation.",
+            "   If the task requires user actions — include the instruction request in your completion\n   report; the lead forwards it to the user and returns the confirmation by SendMessage to\n   your agent id.",
         ),
         ("- Message lead: \"Task {N} complete. decisions/task-{N}.md written.\"",
          "- Completion report: \"Task {N} complete. decisions/task-{N}.md written.\""),
         (
-            "   3. Launch every lens of the set **in one turn** as context-free subagents (`general-purpose`,\n"
-            "      `model: <resolved lens model>`; `security` → `subagent_type: \"security-auditor\"`; Codex uses the resolved profile/model/effort), `run_in_background: false`,",
-            "   3. Launch every lens of the set **in one turn** as context-free subagents (Agent tool,\n"
-            "      `subagent_type: \"general-purpose\"` with the lens tier resolved via\n"
-            "      `workflow-route.py --runtime zcode`; `security` → `subagent_type: \"security-auditor\"`),\n"
-            "      `run_in_background: false`,",
+            "   3. Launch every lens of the set **in one turn** as context-free subagents (`general-purpose`,\n      `model: <resolved lens model>`; `security` → `subagent_type: \"security-auditor\"`; Codex uses the resolved profile/model/effort), `run_in_background: false`,",
+            "   3. Launch every lens of the set **in one turn** as context-free subagents (Agent tool,\n      `subagent_type: \"general-purpose\"` with the lens tier resolved via\n      `workflow-route.py --runtime zcode`; `security` → `subagent_type: \"security-auditor\"`),\n      `run_in_background: false`,",
         ),
         ("(by its name — a fresh spawn is not\n      re-engagement)",
          "(by its agent id from the spawn result —\n      a fresh spawn is not re-engagement)"),
@@ -124,6 +108,7 @@ FILE_RULES: dict[str, list[tuple[str, str]]] = {
     ],
     "skills/skill-tester/references/test-design-guide.md": [
         ("vibe-coding через Claude Code", "vibe-coding через Claude Code или ZCode"),
+        ('"model": "opus"', '"model": "glm-max"'),
     ],
     "skills/skill-tester/references/grading-guide.md": [
         ("a test run of a Claude Code skill", "a test run of a ZCode skill"),
@@ -134,11 +119,9 @@ FILE_RULES: dict[str, list[tuple[str, str]]] = {
         ("Agent files use YAML frontmatter + Markdown body. Store in `~/.claude/agents/{name}.md`.",
          "Agent files use YAML frontmatter + Markdown body. Store in `.zcode/agents/{name}.md`\n(project scope; ZCode discovers them natively)."),
         ("| `model` | `inherit` | Always use `inherit` to match orchestrator's model |",
-         "| `model` | policy tier | Bare model id (`GLM-5.3`, `GLM-5.3-Flash`) from the resource policy |\n"
-         "| `thoughtLevel` | tier | `low` / `high` / `max` — reasoning effort of the subagent's model |"),
+         "| `model` | policy tier | Bare model id (`GLM-5.3`, `GLM-5.3-Flash`) from the resource policy |\n| `thoughtLevel` | tier | `low` / `high` / `max` — reasoning effort of the subagent's model |"),
         ("- [Create custom subagents - Claude Code Docs](https://code.claude.com/docs/en/sub-agents)",
-         "- Project agents live in `.zcode/agents/*.md` (frontmatter: `name`, `description`, `model`,\n"
-         "  `thoughtLevel`, `tools`, `color`); see `.zcode/README.md`."),
+         "- Project agents live in `.zcode/agents/*.md` (frontmatter: `name`, `description`, `model`,\n  `thoughtLevel`, `tools`, `color`); see `.zcode/README.md`."),
     ],
     "skills/infrastructure-setup/SKILL.md": [
         ("If sync reports a conflict, stop and report it. Include the generated Codex entrypoints and the\nmanifest in the same commit as the `.claude/**` source change (details: `.codex/README.md`).",
@@ -151,9 +134,6 @@ FILE_RULES: dict[str, list[tuple[str, str]]] = {
         ("- `sonnet` — fast, good for most tasks\n- `opus` — best quality, use for complex reasoning\n- `haiku` — fastest, use for simple lookups",
          "- `GLM-5.3` — standard work (routine tier)\n- `GLM-5.3-Flash` — fastest, use for simple lookups"),
         ("only Claude can invoke", "only the model can invoke"),
-    ],
-    "skills/skill-tester/references/test-design-guide.md": [
-        ('"model": "opus"', '"model": "glm-max"'),
     ],
     "commands/init-project.md": [
         ("(добавить --codex для Codex)", "(добавить --codex/--zcode для Codex/ZCode)"),
@@ -225,14 +205,14 @@ def apply_rules(text: str, rel: str) -> tuple[str, list[str]]:
 
 def transform_skills_and_commands(src: str, rel: str) -> str:
     if rel.startswith("skills/tech-spec-planning/references/skills-and-reviewers.md"):
-        src = re.sub(r"### Tools available.*?(?=## Examples)", ZCODE_EXECUTOR_CATALOG, src, flags=re.S)
+        src = re.sub(r"### Tools available.*?(?=## Examples)", ZCODE_EXECUTOR_CATALOG, src, flags=re.DOTALL)
     src, _ = apply_rules(src, rel)
     return src
 
 
 def flatten_command_frontmatter(text: str) -> str:
     """ZCode parses command frontmatter flat: single-line values, inline lists."""
-    m = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n?(.*)\Z", text, re.S)
+    m = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n?(.*)\Z", text, re.DOTALL)
     if not m:
         return text
     fm, body = m.groups()
@@ -269,7 +249,7 @@ AGENT_PREAMBLE = """<!-- ZCode runtime adapter: read .zcode/workflow.md first. L
 
 
 def parse_agent_frontmatter(text: str) -> tuple[dict, str] | None:
-    m = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n?(.*)\Z", text, re.S)
+    m = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n?(.*)\Z", text, re.DOTALL)
     if not m:
         return None
     fm_text, body = m.groups()
