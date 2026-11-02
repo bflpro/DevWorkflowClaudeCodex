@@ -88,7 +88,9 @@ def split_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     # bare "teammate_name:" with a trailing comment yields None — fine.
     data = yaml.safe_load(raw) or {}
     if not isinstance(data, dict):
-        raise ValueError("frontmatter is not a mapping")
+        # ValueError is deliberate: the argument type is fine, the YAML content is a
+        # scalar/list; owns-check/wave-check/task-accept catch it around load_task.
+        raise ValueError("frontmatter is not a mapping")  # noqa: TRY004
     return data, body
 
 
@@ -201,7 +203,7 @@ def git(repo: Path, *args: str, check: bool = True) -> str:
     # owns_paths утечкой (кириллическое имя документа в owns_paths задачи).
     result = subprocess.run(
         ["git", "-c", "core.quotepath=off", "-C", str(repo), *args],
-        capture_output=True, text=True, timeout=60,
+        capture_output=True, text=True, timeout=60, check=False,
     )
     if check and result.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
