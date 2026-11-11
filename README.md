@@ -28,8 +28,8 @@ executor's own story of how well it went.
                                                 review lenses, findings triage
                                                 task-accept.py  re-runs verify, owns-check,
                                                                 open findings → receipt
-                             /done            spec criteria re-run as receipts,
-                                              footprint checked against git diff, docs updated
+                             /done            original requirements traced to receipts,
+                                              footprint checked and current scenarios updated
 ```
 
 Alongside the flow:
