@@ -221,8 +221,8 @@
     ".agents/skills/source-command-done/SKILL.md": {
       "source": ".claude/commands/done.md",
       "source_index_path": ".claude/commands/done.md",
-      "source_sha256": "c2432c0e7b9ef662448c04f37e7694e2c695031f66e874df0eb7000635a3b234",
-      "target_sha256": "412806165a0368e8453a104cfbb32bf4e35cfb796934470640d1d7016b3def43"
+      "source_sha256": "719e1f21a9ff3d07955880449f7445d9c7d2dcfc723b0cdec72ea9ed6efbac40",
+      "target_sha256": "58b931c131c19343c4db722d2a94948cff7b1f38f544ad37e27bfe79853b745b"
     },
     ".agents/skills/source-command-elegant/SKILL.md": {
       "source": ".claude/commands/elegant.md",
